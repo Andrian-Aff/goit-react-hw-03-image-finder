@@ -1,57 +1,63 @@
 import './App.css';
-import Modal from './components/Modal'
 import React, {PureComponent } from 'react'
+// import PropTypes from 'prop-types'
+import { ToastContainer } from 'react-toastify';
 import SearchBar from './components/Searchbar'
 import ImageGallery from './components/ImageGallery'
-import Button from './components/Button'
-import ImageGalleryItem from './components/ImageGalleryItem';
+import Modal from './components/Modal'
+
 
 class App extends PureComponent {
 state= {
-  id: '',
+  queryValue: '',
   showModal: false,
-}
-
-componentDidMount() {
-  
+  largeimage: null,
 }
 // shouldComponentUpdate(nextProps, nextState) {
 //   return nextState.state.id !== this.state.id
 // }
-
-componentDidUpdate(prevProps, prevState) {
-  // if(this.state.id !== prevState.id) {
-  // localStorage.setItem()
-  // }
-}
-
-componentWillUnmount() {
+handleSearchOnSubmit= value => {
+  // console.log('queryValue:', value)
+  this.setState({queryValue: value})
+  };
   
-}
+takeLargePicture = e => {
+  if (!e.target) {
+    return;
+  } else {
+    this.setState({
+      largeimage: e.target.attributes['largeimage'].value
+    });
+  }
+  this.toggleModal();
+};
 
-toggleModal(){
-  this.setState(({showModal})=> ({showModal: !showModal}))
-}
-
-onSubmit= ({value}) => {
-console.log('value:', value)
-
+toggleModal = () => {
+  this.setState(({ showModal }) => ({
+    showModal: !showModal,
+  }));
 };
 
 render() {
-  const {showModal} = this.state
+  const {queryValue, showModal, largeimage} = this.state
   return (
     <div className="App">
-    <SearchBar onSubmit={this.onSubmit}/>
-    <ImageGallery>
-      <ImageGalleryItem />
-      <Button/>
-    </ImageGallery>
-    {showModal && <Modal onClose={this.toggleModal}/>}
+    <SearchBar onSubmit={this.handleSearchOnSubmit}/>
+    <ToastContainer autoClose={3000} />
+    <ImageGallery 
+      queryValue={queryValue}
+      onOpen={this.takeLargePicture}
+    /> 
+        {showModal && (
+          <Modal onClose={this.toggleModal}>
+            <img src={largeimage} alt={queryValue} />
+          </Modal>)
+        }
     </div>
   );
 }
 }
-  
+
+
 
 export default App;

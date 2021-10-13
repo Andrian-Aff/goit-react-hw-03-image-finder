@@ -25,3 +25,10 @@ img {
   max-width: 100%;
   height: auto;
 }
+
+.welcomeText {
+  text-align: center;
+  color: #303f9f;
+  font-size: large;
+  font-family: cursive;
+}

@@ -29,7 +29,7 @@ render() {
     return createPortal(
         <div className={s.Overlay} onClick={this.handleBackdropClick}>
             <div className={s.Modal}>
-                <img src="" alt="" />
+                {this.props.children}
             </div>
         </div>, 
         modalRoot,
