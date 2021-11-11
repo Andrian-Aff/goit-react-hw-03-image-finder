@@ -26,10 +26,12 @@ handleBackdropClick = e => {
     }
 }
 render() {
+    const { src, alt } = this.props;
+    
     return createPortal(
         <div className={s.Overlay} onClick={this.handleBackdropClick}>
             <div className={s.Modal}>
-                {this.props.children}
+                <img src={src} alt={alt} />
             </div>
         </div>, 
         modalRoot,

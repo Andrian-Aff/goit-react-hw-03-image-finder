@@ -1,61 +1,86 @@
 import './App.css';
 import React, {PureComponent } from 'react'
-// import PropTypes from 'prop-types'
 import { ToastContainer } from 'react-toastify';
 import SearchBar from './components/Searchbar'
 import ImageGallery from './components/ImageGallery'
-import Modal from './components/Modal'
+// import Modal from './components/Modal'
+import LoaderPend from "./components/Loader";
+import Button from './components/Button'
+import pixabayApi from './components/pixabayApi';
+import Error from './components/Error'
 
 
 class App extends PureComponent {
 state= {
+  error: null,
   queryValue: '',
-  showModal: false,
-  largeimage: null,
+  pictures:[],
+  page:1,
+  status: 'idle'
 }
 // shouldComponentUpdate(nextProps, nextState) {
 //   return nextState.state.id !== this.state.id
 // }
 handleSearchOnSubmit= value => {
   // console.log('queryValue:', value)
-  this.setState({queryValue: value})
+  this.setState({queryValue: value,
+    page:1, pictures:[]})
   };
   
-takeLargePicture = e => {
-  if (!e.target) {
-    return;
-  } else {
-    this.setState({
-      largeimage: e.target.attributes['largeimage'].value
-    });
+componentDidUpdate(prevProps, prevState) {
+  const prevValue = prevState.queryValue ;
+  const nextValue = this.state.queryValue;
+      if(prevValue !== nextValue ) {
+          this.setState({ status: 'pending'});
+          this.renderPictures();
   }
-  this.toggleModal();
-};
+}
 
-toggleModal = () => {
-  this.setState(({ showModal }) => ({
-    showModal: !showModal,
-  }));
+renderPictures = () => {
+  const { page, queryValue } = this.state;
+
+  pixabayApi.fetchPictures(queryValue, page)
+    .then(response =>
+      this.setState(prevState => ({ 
+          pictures: [...prevState.pictures, ...response.hits],
+          page: prevState.page + 1,
+          status: 'resolved'
+       }))
+    )
+    .catch(error => this.setState({ error,  status: 'rejected'}))
 };
 
 render() {
-  const {queryValue, showModal, largeimage} = this.state
+  const { pictures, error, status} = this.state;
+  // const{onOpen} = this.props
+
   return (
     <div className="App">
-    <SearchBar onSubmit={this.handleSearchOnSubmit}/>
-    <ToastContainer autoClose={3000} />
-    <ImageGallery 
-      queryValue={queryValue}
-      onOpen={this.takeLargePicture}
-    /> 
-        {showModal && (
-          <Modal onClose={this.toggleModal}>
-            <img src={largeimage} alt={queryValue} />
-          </Modal>)
-        }
+      <SearchBar onSubmit={this.handleSearchOnSubmit}/>
+      <ToastContainer autoClose={3000} />
+    
+      {status === 'idle'&& (
+        <p className="welcomeText" >Input your query</p> )
+      }
+
+      {status === 'pending' && (<LoaderPend/>)  
+      }
+
+      {status === 'rejected' && (
+          <Error message={error.message}/>)
+      }
+
+      {status === 'resolved' && (
+        <>  
+          <ImageGallery 
+            pictures={pictures}
+            // onOpen={this.takeLargePicture}
+          /> 
+          <Button onLoadMore={this.renderPictures} />
+        </>)}
     </div>
   );
-}
+  }
 }
 
 

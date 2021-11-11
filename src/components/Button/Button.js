@@ -11,7 +11,6 @@ class Button extends Component {
 
   scroll = () => {
     this.props.onLoadMore();
-    console.log(this.props.onLoadMore);
     scroll.scrollToBottom();
   };
 
