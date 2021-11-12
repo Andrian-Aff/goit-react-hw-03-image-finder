@@ -54,6 +54,7 @@ render() {
   const { pictures, error, status} = this.state;
   // const{onOpen} = this.props
 
+  
   return (
     <div className="App">
       <SearchBar onSubmit={this.handleSearchOnSubmit}/>
